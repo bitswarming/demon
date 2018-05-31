@@ -1,0 +1,57 @@
+version: "3"
+services:
+ daemon:
+  environment:
+    - LD_LIBRARY_PATH=/opt/VerAI/lib
+    - DAEMON2BOARD=${DAEMON2BOARD1}
+    - DAEMONPORT=${DAEMON2PORT1}
+    - DAEMONUUID=${DAEMON2UUID}
+    - SERVERUUID=${SERVERUUID}
+    - SERVERDOMAIN=${SERVERDOMAIN}
+    - KEY=${DAEMON2KEY}
+    - NATSPORT=${SERVERNATSPORT}
+    - GRPCPORT=${SERVERGRPCPORT}
+    - TRACKERPORT=${SERVERTRACKERPORT}
+    - T=1
+  #container_name: devverai
+  container_name: "${DAEMON2NAME}${SUFFIX}"
+  working_dir: ${WORKDIR}
+  #network_mode: "host"
+  #privileged: true
+  devices:
+    -  /dev/nvidia1:/dev/nvidia0
+    -  /dev/nvidiactl:/dev/nvidiactl 
+    -  /dev/nvidia-uvm:/dev/nvidia-uvm
+  ports:
+    - ${DAEMON2BOARD1}:${DAEMON2BOARD1}
+    - ${DAEMON2BOARD1}:${DAEMON2BOARD1}/udp
+    - ${DAEMON2PORT1}:${DAEMON2PORT1}
+    - ${DAEMON2PORT1}:${DAEMON2PORT1}/udp
+    #- ${GRPCPORT}:${GRPCPORT}
+    #- ${GRPCPORT}:${GRPCPORT}/udp
+    #- ${TOR2PORT2}:25401
+  extra_hosts:
+    - "deploy.ver.ai:10.0.1.24"
+  volumes:
+    - ${WORKDIR}/devverai/tmp:/opt/VerAI/projects
+    - ${WORKDIR}/devverai/opt:/opt
+    - /mnt/d/Downloads:/Downloads
+  #runtime:
+  #  - nvidia
+  #networks:
+  #  - backend
+  stdin_open: false
+  tty: true
+  restart: always
+  #image: nvidia/cuda
+  image: tensorflow/tensorflow:1.7.0-gpu-py3
+  #command: /usr/bin/supervisord
+  command: /bin/bash
+
+#nvidia-docker run -itd --name test -p 6006:6006 -p 6006:6006/udp -p 50055:50055 -p 50055:50055/udp -p 6881:6881 -p 6881:6881/udp -v /mnt/d/ver.ai/dev/opt:/opt -v  /mnt/d/ver.ai/dev/tmp:/opt/VerAI/projects  tensorflow/tensorflow:1.7.0-gpu-py3  /bin/bash
+#sudo nvidia-docker run -itd -e "LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:/usr/local/cuda/lib64:/opt/VerAI/lib" -p 6006:6006 -v /mnt/d/ver.ai/dev/opt:/opt -v  /mnt/d/ver.ai/dev/tmp:/opt/VerAI/projects  tensorflow/tensorflow:1.7.0-gpu-py3  /bin/bash
+# python3 ./modelassets/main.py ./model.json --uuid 15228533322965f86d0ab-8009-4d54-938e-dca71e73a773 --components_dir ./components --datasets_dir ./datasets --weights_dir ./weights --summaries_dir ./log/summaries --checkpoints_dir ./log/checkpoints --inference_dir ./log/inference
+# nvidia-docker run -itd --name test -p 6006:6006 -p 6006:6006/udp -p 50055:50055 -p 50055:50055/udp -p 6881:6881 -p 6881:6881/udp -v /mnt/d/ver.ai/dev/opt:/opt -v  /mnt/d/ver.ai/dev/tmp:/opt/VerAI/projects  tensorflow/tensorflow:1.7.0-gpu-py3  /bin/bash
+#sudo nvidia-docker run -itd --name deploy -p 6006:6006 -p 6006:6006/udp -p 50055:50055 -p 50055:50055/udp -p 6881:6881 -p 6881:6881/udp -v /mnt/d/ver.ai/dev2/opt:/opt -v  /mnt/d/ver.ai/dev2/tmp:/opt/VerAI/projects  tensorflow/tensorflow:1.7.0-gpu-py3  /bin/bash
+#sudo nvidia-docker run -itd --name deployverai  -p 6008:6008 -p 6008:6008/udp -p 50057:50057 -p 50057:50057/udp -p 6882:6882 -p 6882:6882/udp  -v /mnt/d/ver.ai/devverai/opt:/opt -v  /mnt/d/ver.ai/devverai/tmp:/opt/VerAI/projects  --add-host="deploy.ver.ai:10.0.1.24"   tensorflow/tensorflow:1.7.0-gpu-py3  /bin/bash
+#sudo nvidia-docker run -itd --name deployverai  -p 6882:6882 -p 6882:6882/udp  -v /mnt/d/ver.ai/devverai/opt:/opt -v  /mnt/d/ver.ai/devverai/tmp:/opt/VerAI/projects  --add-host="deploy.ver.ai:10.0.1.24"   tensorflow/tensorflow:1.7.0-gpu-py3  /bin/bash
