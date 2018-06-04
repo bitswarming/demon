@@ -1,4 +1,5 @@
 version: '2.3'
+#docker-compose -f docker-compose.yml up --build -d
 #install nvidia-docker before
 #waiting for runtime key support in version 3 , or change in docker daemon.json default-runtime
 services:
@@ -39,9 +40,9 @@ services:
   extra_hosts:
     - "deploy.ver.ai:10.0.1.24"
   volumes:
-    - ${WORKDIR}/devverai/tmp:/opt/VerAI/projects
+    #- ${WORKDIR}/devverai/tmp:/opt/VerAI/projects
     - ${WORKDIR}/devverai/opt:/opt
-    - /mnt/d/Downloads:/Downloads
+   # - /mnt/d/Downloads:/Downloads
   #runtime:
   #  - nvidia
   #networks:

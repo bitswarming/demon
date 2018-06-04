@@ -47,7 +47,8 @@ c.DockerSpawner.debug = True
 # User containers will access hub by container name on the Docker network
 c.JupyterHub.hub_ip = 'jupyterhub'
 c.JupyterHub.hub_port = 8080
-c.JupyterHub.base_url = '/verbook/10.0.1.10/'
+#c.JupyterHub.base_url = '/verbook/10.0.1.10/'
+c.JupyterHub.base_url = '/verbook/169.254.1.2/'
 #c.JupyterHub.bind_url = 'http://127.0.0.1:8000'
 
 # TLS config
