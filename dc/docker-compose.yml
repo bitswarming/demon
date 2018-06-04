@@ -46,10 +46,12 @@ services:
   depends_on:
     - tincd
   network_mode: "service:tincd"
+  #network-alias: daemon1_dev
   tty: true
   restart: always
   #image: nvidia/cuda
-  image: tensorflow/tensorflow:1.7.0-gpu-py3
+  #image: tensorflow/tensorflow:1.7.0-gpu-py3
+  image: verai/daemon
   #command: /usr/bin/supervisord
   command: /bin/bash
 #JupyterHub docker-compose configuration file
@@ -146,7 +148,9 @@ services:
     #- ${TOR2PORT2}:25401
   cap_add:
     - NET_ADMIN
-  #networks:
+  extra_hosts:
+    - daemon1_dev:172.21.0.3
+ #networks:
   #  - backend
   stdin_open: false
   tty: true
@@ -164,6 +168,7 @@ services:
  # network_mode: "service:tincd"
   links:
    - hub-db
+#   - daemon
 # command: bash
 volumes:
   data:
