@@ -30,30 +30,8 @@ services:
   #  -  /dev/nvidia0:/dev/nvidia0
   #  -  /dev/nvidiactl:/dev/nvidiactl 
   #  -  /dev/nvidia-uvm:/dev/nvidia-uvm
-  ports:
-    - ${DAEMON2BOARD1}:${DAEMON2BOARD1}
-    - ${DAEMON2BOARD1}:${DAEMON2BOARD1}/udp
-    - ${DAEMON2PORT1}:${DAEMON2PORT1}
-    - ${DAEMON2PORT1}:${DAEMON2PORT1}/udp
-    - 50050:50050
-    - 50050:50050/udp
-    - 50051:50051
-    - 50051:50051/udp
-    - 50052:50052
-    - 50052:50052/udp
-    - 50053:50053
-    - 50053:50053/udp
-    - 50054:50054
-    - 50054:50054/udp
-    #- 50055:50055
-    #- 50055:50055/udp
-    - 50056:50056
-    - 50056:50056/udp
-    #- ${GRPCPORT}:${GRPCPORT}
-    #- ${GRPCPORT}:${GRPCPORT}/udp
-    #- ${TOR2PORT2}:25401
-  extra_hosts:
-    - "deploy.ver.ai:10.0.1.24"
+  #extra_hosts:
+  #  - "deploy.ver.ai:10.0.1.24"
   volumes:
     #- ${WORKDIR}/devverai/tmp:/opt/VerAI/projects
     #- ${WORKDIR}/devverai/opt:/opt
@@ -65,6 +43,9 @@ services:
   #networks:
   #  - backend
   stdin_open: false
+  depends_on:
+    - tincd
+  network_mode: "service:tincd"
   tty: true
   restart: always
   #image: nvidia/cuda
@@ -86,6 +67,7 @@ services:
  hub:
     depends_on:
       - hub-db
+      - tincd
     build:
       context: .
       dockerfile: Dockerfile.jupyterhub
@@ -100,11 +82,11 @@ services:
       - "/var/run/docker.sock:/var/run/docker.sock:rw"
       # Bind Docker volume on host for JupyterHub database and cookie secrets
       - "data:${DATA_VOLUME_CONTAINER}"
-    ports:
-      - "443:443"
-      - "80:80"
-    links:
-      - hub-db
+    #ports:
+    #  - "443:443"
+    #  - "80:80"
+#    links:
+#      - hub-db
     environment:
       # All containers will join this network
       DOCKER_NETWORK_NAME: ${DOCKER_NETWORK_NAME}
@@ -117,11 +99,72 @@ services:
       # Postgres db info
       POSTGRES_DB: ${POSTGRES_DB}
       POSTGRES_HOST: hub-db
+      TINCIP: ${TINCIP}
     env_file:
       - secrets/postgres.env
       - secrets/oauth.env
     command: >
       jupyterhub -f /srv/jupyterhub/jupyterhub_config.py
+    #depends_on:
+    #  - tincd
+    network_mode: "service:tincd"
+ tincd:
+  environment:
+    - TINCIP
+  #  - LD_LIBRARY_PATH=/opt/VerAI/lib
+  container_name: tincd
+  #working_dir: ${WORKDIR}
+  #network_mode: "host"
+  #privileged: true
+  devices:
+    -  /dev/net/tun:/dev/net/tun
+  ports:
+    - 443:443
+    - 80:80
+    - 656:655
+    - 656:655/udp
+    - ${DAEMON2BOARD1}:${DAEMON2BOARD1}
+    - ${DAEMON2BOARD1}:${DAEMON2BOARD1}/udp
+    - ${DAEMON2PORT1}:${DAEMON2PORT1}
+    - ${DAEMON2PORT1}:${DAEMON2PORT1}/udp
+    - 50050:50050
+    - 50050:50050/udp
+    - 50051:50051
+    - 50051:50051/udp
+    - 50052:50052
+    - 50052:50052/udp
+    - 50053:50053
+    - 50053:50053/udp
+    - 50054:50054
+    - 50054:50054/udp
+    #- 50055:50055
+    #- 50055:50055/udp
+    - 50056:50056
+    - 50056:50056/udp
+    #- ${GRPCPORT}:${GRPCPORT}
+    #- ${GRPCPORT}:${GRPCPORT}/udp
+    #- ${TOR2PORT2}:25401
+  cap_add:
+    - NET_ADMIN
+  #networks:
+  #  - backend
+  stdin_open: false
+  tty: true
+  restart: always
+  image: verai/tinc
+  #command: /bin/bash
+  command:  /usr/sbin/tincd -n verai -D
+ #t2:
+ # container_name: xf
+ # image: ubuntu:16.04
+ # stdin_open: false
+ # tty: true
+ # depends_on:
+ #   - tincd
+ # network_mode: "service:tincd"
+  links:
+   - hub-db
+# command: bash
 volumes:
   data:
     external:

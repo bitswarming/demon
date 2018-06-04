@@ -12,6 +12,14 @@ c = get_config()
 
 # Spawn single-user servers as Docker containers
 c.JupyterHub.spawner_class = 'dockerspawner.DockerSpawner'
+###
+#c.Spawner.mem_limit = '200M'
+c.DockerSpawner.read_only_volumes = {"nvidia_driver":"/usr/local/nvidia"}
+#c.DockerSpawner.extra_create_kwargs.update({ 'volume_driver': 'nvidia-docker' })
+#c.DockerSpawner.extra_create_kwargs = {"volume_driver":"nvidia-docker"}
+#c.DockerSpawner.extra_create_kwargs.update({ 'volume_driver': 'nvidia-docker' })
+c.DockerSpawner.extra_host_config = { "devices":["/dev/nvidiactl","/dev/nvidia-uvm","/dev/nvidia-uvm-tools","/dev/nvidia0"] }
+###
 # Spawn containers from this image
 c.DockerSpawner.container_image = os.environ['DOCKER_NOTEBOOK_IMAGE']
 # JupyterHub requires a single-user instance of the Notebook server, so we
@@ -45,10 +53,12 @@ c.DockerSpawner.remove_containers = True
 c.DockerSpawner.debug = True
 
 # User containers will access hub by container name on the Docker network
-c.JupyterHub.hub_ip = 'jupyterhub'
+#c.JupyterHub.hub_ip = 'jupyterhub'
+c.JupyterHub.hub_ip = '0.0.0.0'
 c.JupyterHub.hub_port = 8080
 #c.JupyterHub.base_url = '/verbook/10.0.1.10/'
-c.JupyterHub.base_url = '/verbook/169.254.1.2/'
+#c.JupyterHub.base_url = '/verbook/169.254.1.2/'
+c.JupyterHub.base_url = '/verbook/'+os.environ['TINCIP']+'/'
 #c.JupyterHub.bind_url = 'http://127.0.0.1:8000'
 
 # TLS config

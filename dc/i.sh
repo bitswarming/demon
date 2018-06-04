@@ -27,4 +27,10 @@ echo "4. install docker compose"
 curl -L https://github.com/docker/compose/releases/download/1.21.2/docker-compose-$(uname -s)-$(uname -m) -o /usr/local/bin/docker-compose
 chmod +x /usr/local/bin/docker-compose
 echo "5. starting verai"
-docker-compose  -f docker-compose2.yml up -d" 
+git clone 
+docker network create jupyterhub-network
+docker volume create --name=jupyterhub-data
+docker volume create --name=jupyterhub-db-data
+docker volume create --name sokol
+#docker-compose  -f docker-compose2.yml up -d
+docker-compose  -f docker-compose2.yml up  --build   -d
